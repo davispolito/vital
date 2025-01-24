@@ -1,3 +1,10 @@
+Minor changes to vital source code to allow it to compile in Xcode 16.2
+
+I am using this repo to understand how the opengl rendering and simd audio 
+processing works. I think the main doens't have any broken features on vital 
+but i have been playing with this for about a year before now commiting it so i 
+may have borked somethin
+
 # Vital
 Vital is a spectral warping wavetable synthesizer. This is the source.
 
@@ -5,17 +12,6 @@ This repository is updated on a delay after binary releases.
 
 ## Code Licensing
 If you are making a proprietary or closed source app and would like to use Vital's source code, contact licensing@vital.audio for non GPLv3 licensing options.
-
-## Installing
-Create an account and download Vital at [vital.audio](https://vital.audio)
-
-## Issues
-Report bugs (e.g.non-code and non-compiling issues) to https://forum.vital.audio
-
-Feel free to report issues on building/compiling here but note that I'm not prioritizing them.
-
-## Pull requests
-I will not take any pull requests.
 
 ## What can you do with the source
 The source code is licensed under the GPLv3. If you download the source or create builds you must comply with that license.

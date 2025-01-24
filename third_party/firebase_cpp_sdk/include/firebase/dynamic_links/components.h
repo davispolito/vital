@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FIREBASE_DYNAMIC_LINKS_CLIENT_CPP_SRC_INCLUDE_FIREBASE_DYNAMIC_LINKS_COMPONENTS_H_
-#define FIREBASE_DYNAMIC_LINKS_CLIENT_CPP_SRC_INCLUDE_FIREBASE_DYNAMIC_LINKS_COMPONENTS_H_
+#ifndef FIREBASE_DYNAMIC_LINKS_SRC_INCLUDE_FIREBASE_DYNAMIC_LINKS_COMPONENTS_H_
+#define FIREBASE_DYNAMIC_LINKS_SRC_INCLUDE_FIREBASE_DYNAMIC_LINKS_COMPONENTS_H_
 
 #include <cstring>
 #include <string>
@@ -231,12 +231,6 @@ struct DynamicLinkComponents {
   /// URL, be properly URL-encoded, and use the HTTP or HTTPS scheme.
   /// Note, this field is required.
   const char* link;
-  /// Deprecated: The domain (of the form "xyz.app.goo.gl") to use for this
-  /// Dynamic Link.
-  ///
-  /// @deprecated The dynamic_link_domain field is deprecated. Use
-  /// domain_uri_prefix instead, which also supports custom domains.
-  FIREBASE_DEPRECATED const char* dynamic_link_domain;
   /// The domain (of the form "https://xyz.app.goo.gl") to use for this Dynamic
   /// Link. You can find this value in the Dynamic Links section of the Firebase
   /// console.
@@ -262,7 +256,6 @@ struct DynamicLinkComponents {
   /// Default constructor, initializes all fields to null.
   DynamicLinkComponents()
       : link(nullptr),
-        dynamic_link_domain(nullptr),
         domain_uri_prefix(nullptr),
         google_analytics_parameters(nullptr),
         ios_parameters(nullptr),
@@ -281,7 +274,6 @@ struct DynamicLinkComponents {
   /// "https://" as the URI scheme, it will be added.
   DynamicLinkComponents(const char* link_, const char* domain_uri_prefix_)
       : link(link_),
-        dynamic_link_domain(nullptr),
         domain_uri_prefix(domain_uri_prefix_),
         google_analytics_parameters(nullptr),
         ios_parameters(nullptr),
@@ -299,8 +291,10 @@ struct DynamicLinkComponents {
     }
   }
 
+#ifndef INTERNAL_EXPERIMENTAL
 
  private:
+#endif  // INTERNAL_EXPERIMENTAL
   std::string domain_uri_prefix_with_scheme;
 };
 
@@ -339,4 +333,4 @@ Future<GeneratedDynamicLink> GetShortLinkLastResult();
 }  // namespace dynamic_links
 }  // namespace firebase
 
-#endif  // FIREBASE_DYNAMIC_LINKS_CLIENT_CPP_SRC_INCLUDE_FIREBASE_DYNAMIC_LINKS_COMPONENTS_H_
+#endif  // FIREBASE_DYNAMIC_LINKS_SRC_INCLUDE_FIREBASE_DYNAMIC_LINKS_COMPONENTS_H_

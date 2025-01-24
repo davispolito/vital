@@ -144,4 +144,3 @@ namespace vital {
       Parameters() { }
   };
 } // namespace vital
-

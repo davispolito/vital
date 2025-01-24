@@ -223,6 +223,7 @@ void AboutSection::setVisible(bool should_be_visible) {
 
 void AboutSection::buttonClicked(Button* clicked_button) {
   if (clicked_button == check_for_updates_.get())
+  if (clicked_button == check_for_updates_.get())
     LoadSave::saveUpdateCheckConfig(check_for_updates_->getToggleState());
   else if (clicked_button == size_button_extra_small_.get())
     setGuiSize(kMultExtraSmall); 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_INTERNAL_COMMON_H_
-#define FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_INTERNAL_COMMON_H_
+#ifndef FIREBASE_APP_SRC_INCLUDE_FIREBASE_INTERNAL_COMMON_H_
+#define FIREBASE_APP_SRC_INCLUDE_FIREBASE_INTERNAL_COMMON_H_
 
 // This file contains definitions that configure the SDK.
 
@@ -38,7 +38,6 @@
 // stlport doesn't implement std::aligned_storage.
 #if defined(_STLPORT_VERSION)
 #include <cstddef>
-
 
 namespace firebase {
 template <std::size_t Length, std::size_t Alignment>
@@ -63,6 +62,7 @@ struct AlignedStorage {
 #define FIREBASE_USE_EXPLICIT_DEFAULT_METHODS
 #endif  // !(defined(_MSC_VER) && _MSC_VER <= 1800)
 
+#if !defined(DOXYGEN) && !defined(SWIG)
 #if !defined(_WIN32) && !defined(__CYGWIN__)
 // Prevent GCC & Clang from stripping a symbol.
 #define FIREBASE_APP_KEEP_SYMBOL __attribute__((used))
@@ -88,7 +88,7 @@ struct AlignedStorage {
 
 // Declare a module initializer variable as a global.
 #define FIREBASE_APP_REGISTER_CALLBACKS_INITIALIZER_VARIABLE(module_name)     \
-  namespace firebase {                                              \
+  namespace firebase {                                                        \
   extern void* FIREBASE_APP_REGISTER_CALLBACKS_INITIALIZER_NAME(module_name); \
   } /* namespace firebase */
 
@@ -97,10 +97,11 @@ struct AlignedStorage {
 // module initializer for the analytics module.
 #define FIREBASE_APP_REGISTER_CALLBACKS_REFERENCE(module_name)        \
   FIREBASE_APP_REGISTER_CALLBACKS_INITIALIZER_VARIABLE(module_name)   \
-  namespace firebase {                                      \
+  namespace firebase {                                                \
   static void* module_name##_ref FIREBASE_APP_KEEP_SYMBOL =           \
       &FIREBASE_APP_REGISTER_CALLBACKS_INITIALIZER_NAME(module_name); \
   }     /* namespace firebase */
+#endif  //  !defined(DOXYGEN) && !defined(SWIG)
 
 #if defined(SWIG) || defined(DOXYGEN)
 // SWIG needs to ignore the FIREBASE_DEPRECATED tag.
@@ -124,4 +125,4 @@ struct AlignedStorage {
 // Guaranteed compile time strlen.
 #define FIREBASE_STRLEN(s) (FIREBASE_ARRAYSIZE(s) - sizeof((s)[0]))
 
-#endif  // FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_INTERNAL_COMMON_H_
+#endif  // FIREBASE_APP_SRC_INCLUDE_FIREBASE_INTERNAL_COMMON_H_

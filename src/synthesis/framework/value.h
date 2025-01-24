@@ -25,7 +25,7 @@ namespace vital {
       enum {
         kSet,
         kNumInputs
-      };
+        };
 
       Value(poly_float value = 0.0f, bool control_rate = false);
 

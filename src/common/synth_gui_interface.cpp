@@ -96,9 +96,9 @@ void SynthGuiInterface::notifyModulationValueChanged(int index) {
 
 void SynthGuiInterface::connectModulation(std::string source, std::string destination) {
   bool created = synth_->connectModulation(source, destination);
-  if (created)
-    initModulationValues(source, destination);
-  notifyModulationsChanged();
+//  if (created)
+//    initModulationValues(source, destination);
+//  notifyModulationsChanged();
 }
 
 void SynthGuiInterface::connectModulation(vital::ModulationConnection* connection) {
@@ -116,7 +116,7 @@ void SynthGuiInterface::initModulationValues(const std::string& source, const st
   map_generator->initLinear();
 
   std::string power_name = "modulation_" + std::to_string(connection_index + 1) + "_power";
-  synth_->valueChanged(power_name, 0.0f);
+    synth_->valueChanged(power_name, 0.0f);
   gui_->setValue(power_name, 0.0f, NotificationType::dontSendNotification);
 }
 

@@ -300,7 +300,7 @@ void SynthSection::paintChildrenBackgrounds(Graphics& g) {
     Rectangle<int> bounds = getLocalArea(preset_selector_, preset_selector_->getLocalBounds());
     g.reduceClipRegion(bounds);
     g.setOrigin(bounds.getTopLeft());
-    preset_selector_->paintBackground(g);
+preset_selector_->paintBackground(g);
     g.restoreState();
   }
 }
@@ -472,6 +472,7 @@ void SynthSection::addSlider(SynthSlider* slider, bool show, bool listen) {
 
 void SynthSection::addSubSection(SynthSection* sub_section, bool show) {
   sub_section->setParent(this);
+
 
   if (show)
     addAndMakeVisible(sub_section);

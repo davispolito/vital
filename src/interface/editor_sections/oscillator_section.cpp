@@ -1183,4 +1183,3 @@ void OscillatorSection::notifyDestinationChange() {
   if (parent)
     parent->getSynth()->valueChangedInternal(destination_control_name_, current_destination_);
 }
-

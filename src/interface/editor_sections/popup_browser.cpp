@@ -1194,6 +1194,7 @@ void PopupBrowser::resized() {
   Image image(Image::ARGB, 1, 1, false);
   Graphics g(image);
   paintOpenGlChildrenBackgrounds(g);
+    
 }
 
 void PopupBrowser::visibilityChanged() {

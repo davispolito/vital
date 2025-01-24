@@ -27,7 +27,7 @@ namespace vital {
   class Processor;
   class ProcessorRouter;
 
-  struct Output {
+struct Output {
     Output(int size = kMaxBufferSize, int max_oversample = 1) {
       VITAL_ASSERT(size > 0);
 
@@ -125,7 +125,7 @@ namespace vital {
     };
   } // namespace cr
 
-  class Processor {
+class Processor {
     public:
       Processor(int num_inputs, int num_outputs, bool control_rate = false, int max_oversample = 1);
 

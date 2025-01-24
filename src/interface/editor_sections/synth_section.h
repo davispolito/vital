@@ -346,7 +346,7 @@ class SynthSection : public Component, public Slider::Listener,
     std::map<std::string, Button*> button_lookup_;
     std::map<std::string, ModulationButton*> modulation_buttons_;
 
-    std::map<std::string, SynthSlider*> all_sliders_;
+std::map<std::string, SynthSlider*> all_sliders_;
     std::map<std::string, ToggleButton*> all_buttons_;
     std::map<std::string, ModulationButton*> all_modulation_buttons_;
 
@@ -361,6 +361,6 @@ class SynthSection : public Component, public Slider::Listener,
     bool active_;
     bool sideways_heading_;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthSection)
+JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthSection)
 };
 

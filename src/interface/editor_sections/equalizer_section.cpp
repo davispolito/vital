@@ -136,7 +136,7 @@ EqualizerSection::EqualizerSection(String name, const vital::output_map& mono_mo
   selected_band_->setScrollWheelEnabled(false);
 
   setActivator(on_.get());
-  lowBandSelected();
+lowBandSelected();
   setSkinOverride(Skin::kEqualizer);
 }
 

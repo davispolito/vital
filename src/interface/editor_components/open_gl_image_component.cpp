@@ -36,6 +36,7 @@ void OpenGlImageComponent::redrawImage(bool force) {
   Component* component = component_ ? component_ : this;
 
   int pixel_scale = Desktop::getInstance().getDisplays().findDisplayForPoint(getScreenPosition()).scale;
+  //  DBG("pixelscale" + String(pixel_scale));
   int width = component->getWidth() * pixel_scale;
   int height = component->getHeight() * pixel_scale;
   if (width <= 0 || height <= 0)
@@ -60,7 +61,10 @@ void OpenGlImageComponent::redrawImage(bool force) {
   float gl_height = vital::utils::nextPowerOfTwo(height);
   float width_ratio = gl_width / width;
   float height_ratio = gl_height / height;
-
+//    DBG("glwidt " + String(gl_width));
+//       DBG("glheight " + String(gl_height));
+//    DBG("wrat" + String(width_ratio));
+//       DBG("hrat " + String(width_ratio));
   float right = -1.0f + 2.0f * width_ratio;
   float bottom = 1.0f - 2.0f * height_ratio;
   image_.setTopRight(right, 1.0f);

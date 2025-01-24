@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-#ifndef FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_FUTURE_H_
-#define FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_FUTURE_H_
+#ifndef FIREBASE_APP_SRC_INCLUDE_FIREBASE_FUTURE_H_
+#define FIREBASE_APP_SRC_INCLUDE_FIREBASE_FUTURE_H_
 
 #include <stddef.h>
 #include <stdint.h>
+
 #include <utility>
 
 #include "firebase/internal/common.h"
+#include "firebase/internal/mutex.h"
 
 #ifdef FIREBASE_USE_STD_FUNCTION
 #include <functional>
 #endif
-
 
 namespace firebase {
 
@@ -53,7 +54,55 @@ enum FutureStatus {
 
 /// Handle that the API uses to identify an asynchronous call.
 /// The exact interpretation of the handle is up to the API.
-typedef uintptr_t FutureHandle;
+typedef uintptr_t FutureHandleId;
+
+/// Class that provides more context to FutureHandleId, which allows the
+/// underlying API to track handles, perform reference counting, etc.
+class FutureHandle {
+ public:
+  /// @cond FIREBASE_APP_INTERNAL
+  FutureHandle();
+  explicit FutureHandle(FutureHandleId id) : FutureHandle(id, nullptr) {}
+  FutureHandle(FutureHandleId id, detail::FutureApiInterface* api);
+  ~FutureHandle();
+
+  // Copy constructor and assignment operator.
+  FutureHandle(const FutureHandle& rhs);
+  FutureHandle& operator=(const FutureHandle& rhs);
+
+#if defined(FIREBASE_USE_MOVE_OPERATORS)
+  // Move constructor and assignment operator.
+  FutureHandle(FutureHandle&& rhs) noexcept;
+  FutureHandle& operator=(FutureHandle&& rhs) noexcept;
+#endif  // defined(FIREBASE_USE_MOVE_OPERATORS)
+
+  // Comparison operators.
+  bool operator!=(const FutureHandle& rhs) const { return !(*this == rhs); }
+  bool operator==(const FutureHandle& rhs) const {
+    // Only compare IDs, since the API is irrelevant (comparison will only occur
+    // within the context of a single API anyway).
+    return id() == rhs.id();
+  }
+
+  FutureHandleId id() const { return id_; }
+  detail::FutureApiInterface* api() const { return api_; }
+
+  // Detach from the FutureApi. This handle will no longer increment the
+  // Future's reference count. This is mainly used for testing, so that you can
+  // still look up the Future based on its handle's ID without affecting the
+  // reference count yourself.
+  void Detach();
+
+  // Called by CleanupNotifier when the API is being deleted. At this point we
+  // can ignore all of the reference counts since all Future data is about to be
+  // deleted anyway.
+  void Cleanup() { api_ = nullptr; }
+
+ private:
+  FutureHandleId id_;
+  detail::FutureApiInterface* api_;
+  /// @endcond
+};
 
 /// @brief Type-independent return type of asynchronous calls.
 ///
@@ -65,7 +114,7 @@ typedef uintptr_t FutureHandle;
 ///     pointers to its Futures. Therefore, all Futures must be destroyed
 ///     *before* the API is destroyed.
 ///   - Futures can be moved or copied. Call results are reference counted,
-///     and are destroyed when they are long longer referenced by any Futures.
+///     and are destroyed when they are no longer referenced by any Futures.
 ///   - The actual `Status`, `Error`, and `Result` values are kept inside the
 ///     API. This makes synchronization and data management easier.
 ///
@@ -97,7 +146,7 @@ class FutureBase {
   ///
   /// @param api API class used to provide the future implementation.
   /// @param handle Handle to the future.
-  FutureBase(detail::FutureApiInterface* api, FutureHandle handle);
+  FutureBase(detail::FutureApiInterface* api, const FutureHandle& handle);
 
   /// @endcond
 
@@ -226,8 +275,8 @@ class FutureBase {
   /// @param[in] user_data Optional user data. We will pass this back to your
   /// callback.
   /// @return A handle that can be passed to RemoveOnCompletion.
-  CompletionCallbackHandle
-  AddOnCompletion(CompletionCallback callback, void* user_data) const;
+  CompletionCallbackHandle AddOnCompletion(CompletionCallback callback,
+                                           void* user_data) const;
 
 #if defined(FIREBASE_USE_STD_FUNCTION) || defined(DOXYGEN)
   /// Like OnCompletion, but allows adding multiple callbacks.
@@ -261,6 +310,7 @@ class FutureBase {
 
   /// Returns true if the two Futures reference the same result.
   bool operator==(const FutureBase& rhs) const {
+    MutexLock lock(mutex_);
     return api_ == rhs.api_ && handle_ == rhs.handle_;
   }
 
@@ -269,11 +319,16 @@ class FutureBase {
 
 #if defined(INTERNAL_EXPERIMENTAL)
   /// Returns the API-specific handle. Should only be called by the API.
-  FutureHandle GetHandle() const { return handle_; }
+  FutureHandle GetHandle() const {
+    MutexLock lock(mutex_);
+    return handle_;
+  }
 #endif  // defined(INTERNAL_EXPERIMENTAL)
 
  protected:
   /// @cond FIREBASE_APP_INTERNAL
+
+  mutable Mutex mutex_;
 
   /// Backpointer to the issuing API class.
   /// Set to nullptr when Future is invalidated.
@@ -362,7 +417,7 @@ class Future : public FutureBase {
   ///
   /// @param api API class used to provide the future implementation.
   /// @param handle Handle to the future.
-  Future(detail::FutureApiInterface* api, FutureHandle handle)
+  Future(detail::FutureApiInterface* api, const FutureHandle& handle)
       : FutureBase(api, handle) {}
 
   /// @endcond
@@ -406,8 +461,8 @@ class Future : public FutureBase {
   /// @note This is the same callback as FutureBase::OnCompletion(), so you
   /// can't expect to set both and have both run; again, only the most recently
   /// registered one will run.
-  inline void
-  OnCompletion(TypedCompletionCallback callback, void* user_data) const;
+  inline void OnCompletion(TypedCompletionCallback callback,
+                           void* user_data) const;
 
 #if defined(FIREBASE_USE_STD_FUNCTION) || defined(DOXYGEN)
   /// Register a single callback that will be called at most once, when the
@@ -424,8 +479,8 @@ class Future : public FutureBase {
   /// @note This is the same callback as FutureBase::OnCompletion(), so you
   /// can't expect to set both and have both run; again, only the most recently
   /// registered one will run.
-  inline void
-  OnCompletion(std::function<void(const Future<ResultType>&)> callback) const;
+  inline void OnCompletion(
+      std::function<void(const Future<ResultType>&)> callback) const;
 #endif  // defined(FIREBASE_USE_STD_FUNCTION) || defined(DOXYGEN)
 
 #if defined(INTERNAL_EXPERIMENTAL)
@@ -444,8 +499,8 @@ class Future : public FutureBase {
   /// @param[in] user_data Optional user data. We will pass this back to your
   /// callback.
   /// @return A handle that can be passed to RemoveOnCompletion.
-  inline CompletionCallbackHandle
-  AddOnCompletion(TypedCompletionCallback callback, void* user_data) const;
+  inline CompletionCallbackHandle AddOnCompletion(
+      TypedCompletionCallback callback, void* user_data) const;
 
 #if defined(FIREBASE_USE_STD_FUNCTION) || defined(DOXYGEN)
   /// Like OnCompletion, but allows adding multiple callbacks.
@@ -464,17 +519,15 @@ class Future : public FutureBase {
   ///
   /// @note This method is not available when using STLPort on Android, as
   /// `std::function` is not supported on STLPort.
-  inline CompletionCallbackHandle
-  AddOnCompletion(std::function<void(const Future<ResultType>&)> callback)
-      const;
+  inline CompletionCallbackHandle AddOnCompletion(
+      std::function<void(const Future<ResultType>&)> callback) const;
 #endif  // defined(FIREBASE_USE_STD_FUNCTION) || defined(DOXYGEN)
 #endif  // defined(INTERNAL_EXPERIMENTAL)
 };
 
-// NOLINTNEXTLINE - allow namespace overridden
 }  // namespace firebase
 
 // Include the inline implementation.
 #include "firebase/internal/future_impl.h"
 
-#endif  // FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_FUTURE_H_
+#endif  // FIREBASE_APP_SRC_INCLUDE_FIREBASE_FUTURE_H_

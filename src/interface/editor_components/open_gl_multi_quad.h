@@ -191,7 +191,7 @@ class OpenGlMultiQuad : public OpenGlComponent {
       dirty_ = true;
     }
 
-    void setQuad(int i, float x, float y, float w, float h) {
+void setQuad(int i, float x, float y, float w, float h) {
       VITAL_ASSERT(i < max_quads_);
       int index = i * kNumFloatsPerQuad;
       data_[index] = x;

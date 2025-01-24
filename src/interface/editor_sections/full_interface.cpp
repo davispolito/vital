@@ -424,7 +424,9 @@ void FullInterface::resized() {
   }
 
   setSizeRatio(ratio);
-
+    DBG("");
+        DBG( "ratio: " + String(ratio));
+        DBG("display scale" + String(display_scale_));
   if (expired_section_)
     expired_section_->setBounds(bounds);
 

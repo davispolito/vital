@@ -71,7 +71,7 @@ namespace vital {
     JUCE_LEAK_DETECTOR(ModuleData)
   };
 
-  class SynthModule : public ProcessorRouter {
+class SynthModule : public ProcessorRouter {
     public:
       SynthModule(int num_inputs, int num_outputs, bool control_rate = false) :
           ProcessorRouter(num_inputs, num_outputs, control_rate) {

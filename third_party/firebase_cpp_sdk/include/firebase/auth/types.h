@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef FIREBASE_AUTH_CLIENT_CPP_SRC_INCLUDE_FIREBASE_AUTH_TYPES_H_
-#define FIREBASE_AUTH_CLIENT_CPP_SRC_INCLUDE_FIREBASE_AUTH_TYPES_H_
+#ifndef FIREBASE_AUTH_SRC_INCLUDE_FIREBASE_AUTH_TYPES_H_
+#define FIREBASE_AUTH_SRC_INCLUDE_FIREBASE_AUTH_TYPES_H_
 
+#include <map>
+#include <string>
+#include <vector>
 
 namespace firebase {
 namespace auth {
@@ -26,6 +29,11 @@ namespace auth {
 /// @if cpp_examples
 /// call Future::ErrorMessage().
 /// @endif
+/// <SWIG>
+/// @if swig_examples
+/// use the FirebaseException.Message property.
+/// @endif
+/// </SWIG>
 enum AuthError {
   /// Success.
   kAuthErrorNone = 0,
@@ -204,8 +212,8 @@ enum AuthError {
   /// @note This error is only reported on Android.
   kAuthErrorMissingPassword,
 
-  /// Indicates that the quota of SMS messages for a given project has been
-  /// exceeded.
+  /// Indicates that the project's quota for this operation (SMS messages,
+  /// sign-ins, account creation) has been exceeded. Try again later.
   kAuthErrorQuotaExceeded,
 
   /// Thrown when one or more of the credentials passed to a method fail to
@@ -230,29 +238,29 @@ enum AuthError {
 
   /// Indicates that the reCAPTCHA token is not valid.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorCaptchaCheckFailed,
 
   /// Indicates that an invalid APNS device token was used in the verifyClient
   /// request.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorInvalidAppCredential,
 
   /// Indicates that the APNS device token is missing in the verifyClient
   /// request.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorMissingAppCredential,
 
   /// Indicates that the clientID used to invoke a web flow is invalid.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorInvalidClientId,
 
   /// Indicates that the domain specified in the continue URI is not valid.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorInvalidContinueUri,
 
   /// Indicates that a continue URI was not provided in a request to the backend
@@ -262,7 +270,7 @@ enum AuthError {
   /// Indicates an error occurred while attempting to access the keychain.
   /// Common error code for all API Methods.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorKeychainError,
 
   /// Indicates that the APNs device token could not be obtained. The app may
@@ -270,24 +278,24 @@ enum AuthError {
   /// forward the APNs device token to FIRAuth if app delegate swizzling is
   /// disabled.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorMissingAppToken,
 
   /// Indicates that the iOS bundle ID is missing when an iOS App Store ID is
   /// provided.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorMissingIosBundleId,
 
   /// Indicates that the app fails to forward remote notification to FIRAuth.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorNotificationNotForwarded,
 
   /// Indicates that the domain specified in the continue URL is not white-
   /// listed in the Firebase console.
   ///
-  /// @note This error is iOS-specific.
+  /// @note This error is iOS and tvOS-specific.
   kAuthErrorUnauthorizedDomain,
 
   /// Indicates that an attempt was made to present a new web context while one
@@ -385,10 +393,81 @@ enum AuthError {
   /// updateEmail instead of verifyBeforeUpdateEmail.
   kAuthErrorEmailChangeNeedsVerification,
 
+#ifdef INTERNAL_EXPERIMENTAL
+  /// Indicates that the provided event handler is null or invalid.
+  kAuthErrorInvalidEventHandler,
+
+  /// Indicates that the federated provider is busy with a previous
+  /// authorization request. Try again when the previous authorization request
+  /// completes.
+  kAuthErrorFederatedProviderAreadyInUse,
+
+  /// Indicates that one or more fields of the provided AuthenticatedUserData
+  /// are invalid.
+  kAuthErrorInvalidAuthenticatedUserData,
+
+  /// Indicates that an error occurred during a Federated Auth UI Flow when the
+  /// user was prompted to enter their credentials.
+  kAuthErrorFederatedSignInUserInteractionFailure,
+
+  /// Indicates that a request was made with a missing or invalid nonce.
+  /// This can happen if the hash of the provided raw nonce did not match the
+  /// hashed nonce in the OIDC ID token payload.
+  kAuthErrorMissingOrInvalidNonce,
+
+  /// Indicates that the user did not authorize the application during Generic
+  /// IDP sign-in.
+  kAuthErrorUserCancelled,
+
+  /// Indicates that a request was made to an unsupported backend endpoint in
+  /// passthrough mode.
+  kAuthErrorUnsupportedPassthroughOperation,
+
+  /// Indicates that a token refresh was requested, but neither a refresh token
+  /// nor a custom token provider is available.
+  kAuthErrorTokenRefreshUnavailable,
+
+#endif  // INTERNAL_EXEPERIMENTAL
 };
 
+/// @brief Contains information required to authenticate with a third party
+/// provider.
+struct FederatedProviderData {
+  /// @brief contains the id of the provider to be used during sign-in, link, or
+  /// reauthentication requests.
+  std::string provider_id;
+};
+
+/// @brief Contains information to identify an OAuth povider.
+struct FederatedOAuthProviderData : FederatedProviderData {
+  /// Initailizes an empty provider data structure.
+  FederatedOAuthProviderData() {}
+
+  /// Initializes the provider data structure with a provider id.
+  explicit FederatedOAuthProviderData(const std::string& provider) {
+    this->provider_id = provider;
+  }
+
+#ifndef SWIG
+  /// @brief Initializes the provider data structure with the specified provider
+  /// id, scopes and custom parameters.
+  FederatedOAuthProviderData(
+      const std::string& provider, std::vector<std::string> scopes,
+      std::map<std::string, std::string> custom_parameters) {
+    this->provider_id = provider;
+    this->scopes = scopes;
+    this->custom_parameters = custom_parameters;
+  }
+#endif
+
+  /// OAuth parmeters which specify which rights of access are being requested.
+  std::vector<std::string> scopes;
+
+  /// OAuth parameters which are provided to the federated provider service.
+  std::map<std::string, std::string> custom_parameters;
+};
 
 }  // namespace auth
 }  // namespace firebase
 
-#endif  // FIREBASE_AUTH_CLIENT_CPP_SRC_INCLUDE_FIREBASE_AUTH_TYPES_H_
+#endif  // FIREBASE_AUTH_SRC_INCLUDE_FIREBASE_AUTH_TYPES_H_

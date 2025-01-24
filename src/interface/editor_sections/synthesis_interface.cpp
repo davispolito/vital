@@ -53,11 +53,11 @@ void SynthesisInterface::paintBackground(Graphics& g) {
 }
 
 void SynthesisInterface::resized() {
-  int padding = getPadding();
-  int active_width = getWidth() - padding;
-  int width_left = (active_width - padding) / 2;
-  int width_right = active_width - width_left;
-  int right_x = width_left + padding;
+    int padding = getPadding();
+    int active_width = getWidth() - padding;
+    int width_left = (active_width - padding) / 2;
+    int width_right = active_width - width_left;
+    int right_x = width_left + padding;
 
   int oscillator_margin = oscillators_[0]->findValue(Skin::kWidgetMargin);
   int oscillator_height = 2 * (int)oscillators_[0]->getKnobSectionHeight() - oscillator_margin;

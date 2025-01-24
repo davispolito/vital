@@ -1,4 +1,4 @@
-﻿// Provides a C++11 implementation of a multi-producer, multi-consumer lock-free queue.
+// Provides a C++11 implementation of a multi-producer, multi-consumer lock-free queue.
 // An overview, including benchmark results, is provided here:
 //     http://moodycamel.com/blog/2014/a-fast-general-purpose-lock-free-queue-for-c++
 // The full design is also described in excruciating detail at:
@@ -1071,7 +1071,7 @@ public:
 	// consumer scenarios. This is mostly only useful for internal unit tests.
 	// Never allocates. Thread-safe.
 	template<typename U>
-	bool try_dequeue_non_interleaved(U& item)
+    bool try_dequeue_non_interleaved(U& item)
 	{
 		for (auto ptr = producerListTail.load(std::memory_order_acquire); ptr != nullptr; ptr = ptr->next_prod()) {
 			if (ptr->dequeue(item)) {

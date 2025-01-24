@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_VARIANT_H_
-#define FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_VARIANT_H_
+#ifndef FIREBASE_APP_SRC_INCLUDE_FIREBASE_VARIANT_H_
+#define FIREBASE_APP_SRC_INCLUDE_FIREBASE_VARIANT_H_
 
 #include <stdint.h>
 
@@ -33,10 +33,15 @@ namespace firebase {
 namespace internal {
 class VariantInternal;
 }
-}
+}  // namespace firebase
 
 namespace firebase {
 
+// <SWIG>
+// SWIG uses the Variant class as a readonly object, and so ignores most of the
+// functions. In order to keep things clean, functions that should be exposed
+// are explicitly listed in app.SWIG, and everything else is ignored.
+// </SWIG>
 
 /// Variant data type used by Firebase libraries.
 class Variant {
@@ -71,12 +76,15 @@ class Variant {
     // Note: If you add new types update enum InternalType;
   };
 
+// <SWIG>
+// Because of the VariantVariantMap C# class, we need to hide the constructors
+// explicitly, as the SWIG ignore does not seem to work with that macro.
+// </SWIG>
+#ifndef SWIG
   /// @brief Construct a null Variant.
   ///
   /// The Variant constructed will be of type Null.
-  Variant()
-    : type_(kInternalTypeNull)
-    , value_({}) {}
+  Variant() : type_(kInternalTypeNull), value_({}) {}
 
   /// @brief Construct a Variant with the given templated type.
   ///
@@ -117,8 +125,8 @@ class Variant {
   ///   * `std::map<K, V>` where K and V is convertible to variant type
   template <typename T>
   Variant(T value)  // NOLINT
-    : type_(kInternalTypeNull) {
-    set_value_t<T>(value);
+      : type_(kInternalTypeNull) {
+    set_value_t(value);
   }
 
   /// @brief Construct a Variant containing the given string value (makes a
@@ -129,7 +137,7 @@ class Variant {
   ///
   /// @param[in] value The string to use for the Variant.
   Variant(const std::string& value)  // NOLINT
-    : type_(kInternalTypeNull) {
+      : type_(kInternalTypeNull) {
     set_mutable_string(value);
   }
 
@@ -139,7 +147,7 @@ class Variant {
   ///
   /// @param[in] value The STL vector to copy into the Variant.
   Variant(const std::vector<Variant>& value)  // NOLINT
-    : type_(kInternalTypeNull) {
+      : type_(kInternalTypeNull) {
     set_vector(value);
   }
 
@@ -153,7 +161,7 @@ class Variant {
   /// each element, and copied into the Vector Variant constructed here.
   template <typename T>
   Variant(const std::vector<T>& value)  // NOLINT
-    : type_(kInternalTypeNull) {
+      : type_(kInternalTypeNull) {
     Clear(kTypeVector);
     vector().reserve(value.size());
     for (size_t i = 0; i < value.size(); i++) {
@@ -172,7 +180,7 @@ class Variant {
   /// @param[in] array_size Number of elements of the array.
   template <typename T>
   Variant(const T array_of_values[], size_t array_size)
-    : type_(kInternalTypeNull) {
+      : type_(kInternalTypeNull) {
     Clear(kTypeVector);
     vector().reserve(array_size);
     for (size_t i = 0; i < array_size; i++) {
@@ -187,7 +195,7 @@ class Variant {
   ///
   /// @param[in] value The STL map to copy into the Variant.
   Variant(const std::map<Variant, Variant>& value)  // NOLINT
-  : type_(kInternalTypeNull) {
+      : type_(kInternalTypeNull) {
     set_map(value);
   }
 
@@ -203,7 +211,7 @@ class Variant {
   /// Variant constructed here.
   template <typename K, typename V>
   Variant(const std::map<K, V>& value)  // NOLINT
-    : type_(kInternalTypeNull) {
+      : type_(kInternalTypeNull) {
     Clear(kTypeMap);
     for (typename std::map<K, V>::const_iterator i = value.begin();
          i != value.end(); ++i) {
@@ -238,6 +246,7 @@ class Variant {
   Variant& operator=(Variant&& other) noexcept;
 
 #endif  // defined(FIREBASE_USE_MOVE_OPERATORS) || defined(DOXYGEN)
+#endif  // SWIG
 
   /// Destructor. Frees the memory that this Variant owns.
   ~Variant() { Clear(); }
@@ -1090,14 +1099,11 @@ class Variant {
     value_.blob_value.size = size;
   }
 
-  // Templated helper function to ensure the value 0 is constructed as int
-  // instead of nullptr char*
-  //
   // If you hit a compiler error here it means you are trying to construct a
   // variant with unsupported type. Ether cast to correct type or add support
   // below.
   template <typename T>
-  void set_value_t(T value);
+  void set_value_t(T value) = delete;
 
   // Get whether this Variant contains a small string.
   bool is_small_string() const { return type_ == kInternalTypeSmallString; }
@@ -1108,8 +1114,8 @@ class Variant {
   // Older versions of visual studio cant have this inline in the union and do
   // sizeof for small string
   typedef struct {
-      const uint8_t* ptr;
-      size_t size;
+    const uint8_t* ptr;
+    size_t size;
   } BlobValue;
 
   // Union of plain old data (scalars or pointers).
@@ -1125,7 +1131,7 @@ class Variant {
     char small_string[sizeof(BlobValue)];
   } value_;
 
-  static const size_t kMaxSmallStringSize = sizeof(Value::small_string);
+  static constexpr size_t kMaxSmallStringSize = sizeof(Value::small_string);
 
   friend class firebase::internal::VariantInternal;
 };
@@ -1188,4 +1194,4 @@ inline void Variant::set_value_t<char*>(char* value) {
 // NOLINTNEXTLINE - allow namespace overridden
 }  // namespace firebase
 
-#endif  // FIREBASE_APP_CLIENT_CPP_SRC_INCLUDE_FIREBASE_VARIANT_H_
+#endif  // FIREBASE_APP_SRC_INCLUDE_FIREBASE_VARIANT_H_

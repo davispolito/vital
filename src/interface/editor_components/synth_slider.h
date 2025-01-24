@@ -60,7 +60,7 @@ class OpenGlSlider : public Slider {
     }
 
     virtual void resized() override {
-      Slider::resized();
+  Slider::resized();
       setColors();
       setSliderDisplayValues();
     }
@@ -463,7 +463,7 @@ class SynthSlider : public OpenGlSlider, public TextEditor::Listener {
 
     Component* extra_modulation_target_;
     SynthGuiInterface* synth_interface_;
-    std::unique_ptr<OpenGlTextEditor> text_entry_;
+std::unique_ptr<OpenGlTextEditor> text_entry_;
 
     std::vector<SliderListener*> slider_listeners_;
 

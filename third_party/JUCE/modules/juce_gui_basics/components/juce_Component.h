@@ -119,7 +119,7 @@ public:
 
         @see isShowing, setVisible
     */
-    bool isVisible() const noexcept                         { return flags.visibleFlag; }
+bool isVisible() const noexcept                         { return flags.visibleFlag; }
 
     /** Called when this component's visibility changes.
         @see setVisible, isVisible

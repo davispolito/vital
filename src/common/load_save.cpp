@@ -169,30 +169,30 @@ void LoadSave::loadControls(SynthBase* synth, const json& data) {
 
 void LoadSave::loadModulations(SynthBase* synth, const json& modulations) {
   synth->clearModulations();
-  vital::ModulationConnectionBank& modulation_bank = synth->getModulationBank();
-  int index = 0;
-  for (const json& modulation : modulations) {
-    std::string source = modulation["source"];
-    std::string destination = modulation["destination"];
-    vital::ModulationConnection* connection = modulation_bank.atIndex(index);
-    index++;
-
-    if (synth->getEngine()->getModulationSource(source) == nullptr ||
-        synth->getEngine()->getMonoModulationDestination(destination) == nullptr) {
-      continue;
-    }
-    
-    if (source.length() && destination.length()) {
-      connection->source_name = source;
-      connection->destination_name = destination;
-      synth->connectModulation(connection);
-    }
-
-    if (modulation.count("line_mapping"))
-      connection->modulation_processor->lineMapGenerator()->jsonToState(modulation["line_mapping"]);
-    else
-      connection->modulation_processor->lineMapGenerator()->initLinear();
-  }
+//  vital::ModulationConnectionBank& modulation_bank = synth->getModulationBank();
+//  int index = 0;
+//  for (const json& modulation : modulations) {
+//    std::string source = modulation["source"];
+//    std::string destination = modulation["destination"];
+//    vital::ModulationConnection* connection = modulation_bank.atIndex(index);
+//    index++;
+//
+//    if (synth->getEngine()->getModulationSource(source) == nullptr ||
+//        synth->getEngine()->getMonoModulationDestination(destination) == nullptr) {
+//      continue;
+//    }
+//    
+//    if (source.length() && destination.length()) {
+//      connection->source_name = source;
+//      connection->destination_name = destination;
+//      synth->connectModulation(connection);
+//    }
+//
+//    if (modulation.count("line_mapping"))
+//      connection->modulation_processor->lineMapGenerator()->jsonToState(modulation["line_mapping"]);
+//    else
+//      connection->modulation_processor->lineMapGenerator()->initLinear();
+//  }
 }
 
 void LoadSave::loadSample(SynthBase* synth, const json& json_sample) {

@@ -34,7 +34,7 @@ namespace vital {
   constexpr int kMaxPolyphony = 33;
   constexpr int kMaxActivePolyphony = 32;
   constexpr int kLfoDataResolution = 2048;
-  constexpr int kMaxModulationConnections = 64;
+  constexpr int kMaxModulationConnections = 10;
 
   constexpr int kOscilloscopeMemorySampleRate = 22000;
   constexpr int kOscilloscopeMemoryResolution = 512;

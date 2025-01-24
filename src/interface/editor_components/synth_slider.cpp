@@ -296,7 +296,7 @@ void SynthSlider::mouseDrag(const MouseEvent& e) {
     setDefaultRange();
     
   sensitive_mode_ = e.mods.isCommandDown();
-  if (sensitive_mode_)
+    if (sensitive_mode_)
     multiply *= kSlowDragMultiplier;
 
   if (isRotary())

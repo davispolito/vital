@@ -174,7 +174,7 @@ void SynthBase::connectModulation(vital::ModulationConnection* connection) {
   else if (mod_connections_.count(connection) == 0) {
     change.disconnecting = false;
     mod_connections_.push_back(connection);
-    modulation_change_queue_.enqueue(change);
+//    modulation_change_queue_.enqueue(change);
   }
 }
 

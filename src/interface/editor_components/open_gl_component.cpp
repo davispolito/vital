@@ -70,7 +70,9 @@ bool OpenGlComponent::setViewPort(Component* component, Rectangle<int> bounds, O
   glViewport(gl_scale * global_bounds.getX(),
              std::ceil(scale * render_scale * top_level_bounds.getHeight()) - gl_scale * global_bounds.getBottom(),
              gl_scale * global_bounds.getWidth(), gl_scale * global_bounds.getHeight());
-
+//    DBG("x" +String(gl_scale * global_bounds.getX()) +
+//          "y" + String (std::ceil(scale * render_scale * top_level_bounds.getHeight()) - gl_scale * global_bounds.getBottom()) +
+//        "width" + String(  gl_scale * global_bounds.getWidth())  + "height" + String( gl_scale * global_bounds.getHeight()));
   if (visible_bounds.getWidth() <= 0 || visible_bounds.getHeight() <= 0)
     return false;
 
